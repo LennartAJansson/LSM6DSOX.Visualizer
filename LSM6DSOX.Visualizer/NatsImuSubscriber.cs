@@ -19,6 +19,8 @@ public class NatsImuSubscriber : IDisposable
 
     public event Action<ImuSample>? SampleReceived;
     public event Action<Exception>? ConnectionError;
+    public event Action? Connected;
+    public event Action? Disconnected;
 
     public NatsImuSubscriber(string url, string subject)
     {
@@ -35,9 +37,22 @@ public class NatsImuSubscriber : IDisposable
             opts.Url = _url;
             opts.MaxReconnect = Options.ReconnectForever;
             opts.ReconnectWait = 2000;
+            opts.DisconnectedEventHandler = (_, _) => Disconnected?.Invoke();
+            opts.ReconnectedEventHandler = (_, _) => Connected?.Invoke();
+            opts.ClosedEventHandler = (_, _) => Disconnected?.Invoke();
+            opts.AsyncErrorEventHandler = (_, args) => ConnectionError?.Invoke(new InvalidOperationException(args.Error));
 
             _connection = cf.CreateConnection(opts);
             _subscription = _connection.SubscribeAsync(_subject, OnMessage);
+
+            if (_connection.State == ConnState.CONNECTED)
+            {
+                Connected?.Invoke();
+            }
+            else
+            {
+                Disconnected?.Invoke();
+            }
         }
         catch (Exception ex)
         {

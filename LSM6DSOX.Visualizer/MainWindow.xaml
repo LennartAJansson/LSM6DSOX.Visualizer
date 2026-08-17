@@ -16,7 +16,7 @@
                 <Ellipse x:Name="StatusDot" Width="12" Height="12" Fill="Gray" Margin="0,0,8,0" />
                 <TextBlock x:Name="StatusText" Text="Ansluter till NATS..." Foreground="White" VerticalAlignment="Center" />
                 <TextBlock x:Name="SampleCountText" Text="" Foreground="Gray" Margin="20,0,0,0" VerticalAlignment="Center" />
-                <TextBlock Text="🟦 Orientering    🟧 Accelerationsvektor" Foreground="Gray" Margin="30,0,0,0" VerticalAlignment="Center" />
+                <TextBlock Text="🟦 Sensorhus    🟥 Babord/Vänster    🟩 Styrbord/Höger    🟨 Framåt    🟧 Accelerationsvektor" Foreground="Gray" Margin="30,0,0,0" VerticalAlignment="Center" />
             </StackPanel>
         </Border>
 
@@ -43,17 +43,8 @@
                 </ModelVisual3D.Content>
             </ModelVisual3D>
 
-            <!-- Sensorkuben -->
-            <ModelVisual3D x:Name="SensorCube">
-                <ModelVisual3D.Content>
-                    <Model3DGroup>
-                        <GeometryModel3D x:Name="CubeGeometry">
-                            <GeometryModel3D.Material>
-                                <DiffuseMaterial Brush="#FF4FC3F7" />
-                            </GeometryModel3D.Material>
-                        </GeometryModel3D>
-                    </Model3DGroup>
-                </ModelVisual3D.Content>
+            <!-- Sensor kropp + riktningsmarkörer -->
+            <ModelVisual3D x:Name="SensorModel">
                 <ModelVisual3D.Transform>
                     <RotateTransform3D>
                         <RotateTransform3D.Rotation>
@@ -61,6 +52,34 @@
                         </RotateTransform3D.Rotation>
                     </RotateTransform3D>
                 </ModelVisual3D.Transform>
+                <ModelVisual3D.Children>
+                    <!-- Sensorhus -->
+                    <hx:BoxVisual3D Center="0,0,0"
+                                    Width="1.2"
+                                    Length="0.8"
+                                    Height="0.2"
+                                    Fill="#FF4FC3F7" />
+
+                    <!-- Babord / vänster (+Y) -->
+                    <hx:BoxVisual3D Center="0,0.43,0"
+                                    Width="1.16"
+                                    Length="0.06"
+                                    Height="0.22"
+                                    Fill="#FFE53935" />
+
+                    <!-- Styrbord / höger (-Y) -->
+                    <hx:BoxVisual3D Center="0,-0.43,0"
+                                    Width="1.16"
+                                    Length="0.06"
+                                    Height="0.22"
+                                    Fill="#FF43A047" />
+
+                    <!-- Framåt (+X) -->
+                    <hx:ArrowVisual3D Point1="0.40,0,0.16"
+                                      Point2="1.05,0,0.16"
+                                      Diameter="0.05"
+                                      Fill="#FFFFD54F" />
+                </ModelVisual3D.Children>
             </ModelVisual3D>
 
             <!-- Accelerationsvektor -->

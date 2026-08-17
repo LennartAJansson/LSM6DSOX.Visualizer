@@ -3,7 +3,7 @@ using System.Media;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using HelixToolkit.Wpf;
+
 using LSM6DSOX.Visualizer.Models;
 
 namespace LSM6DSOX.Visualizer;
@@ -22,27 +22,36 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        BuildCubeGeometry();
         Loaded += (_, _) => StartNats();
         Closing += (_, _) => _subscriber?.Dispose();
-    }
-
-    private void BuildCubeGeometry()
-    {
-        var builder = new MeshBuilder();
-        // Kub som representerar sensorbrädet: bredare i X/Y, tunnare i Z
-        builder.AddBox(new Point3D(0, 0, 0), 1.2, 0.8, 0.2);
-        CubeGeometry.Geometry = builder.ToMesh();
     }
 
     private void StartNats()
     {
         _subscriber = new NatsImuSubscriber(NatsUrl, NatsSubject);
         _subscriber.SampleReceived += OnSampleReceived;
+        _subscriber.Connected += OnConnected;
+        _subscriber.Disconnected += OnDisconnected;
         _subscriber.ConnectionError += OnConnectionError;
-        _subscriber.Start();
 
-        SetStatus(Brushes.Orange, $"Ansluten, väntar på data ({NatsSubject})...");
+        SetStatus(Brushes.Orange, $"Ansluter till NATS ({NatsSubject})...");
+        _subscriber.Start();
+    }
+
+    private void OnConnected()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            SetStatus(Brushes.Orange, $"Ansluten, väntar på data ({NatsSubject})...");
+        });
+    }
+
+    private void OnDisconnected()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            SetStatus(Brushes.Red, $"Ingen NATS-anslutning ({NatsSubject})");
+        });
     }
 
     private void OnSampleReceived(ImuSample sample)
