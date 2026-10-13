@@ -1,0 +1,16 @@
+# Byggutdata
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# NuGet
+*.nupkg
+packages/
+
+# Loggar och tillfälliga filer
+*.log
+*.tmp
