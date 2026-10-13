@@ -41,6 +41,8 @@ public class NatsImuSubscriber : IDisposable
             opts.ReconnectWait = 2000;
             opts.DisconnectedEventHandler += (_, _) => StatusChanged?.Invoke("Frånkopplad, försöker återansluta...");
             opts.ReconnectedEventHandler += (_, _) => StatusChanged?.Invoke("Återansluten");
+            opts.ClosedEventHandler += (_, _) => StatusChanged?.Invoke("Anslutningen stängd");
+            opts.AsyncErrorEventHandler += (_, args) => ConnectionError?.Invoke(new InvalidOperationException(args.Error));
 
             _connection = new ConnectionFactory().CreateConnection(opts);
 

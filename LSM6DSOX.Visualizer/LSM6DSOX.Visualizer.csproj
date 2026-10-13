@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HelixToolkit.Wpf" Version="2.24.0" />
-    <PackageReference Include="NATS.Client" Version="1.1.5" />
+    <PackageReference Include="HelixToolkit.Wpf" Version="3.1.2" />
+    <PackageReference Include="NATS.Client" Version="1.1.8" />
     <PackageReference Include="ScottPlot.WPF" Version="5.0.*" />
   </ItemGroup>
 

@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Koordinatsystem.md" />
+  </Folder>
   <Project Path="LSM6DSOX.Visualizer/LSM6DSOX.Visualizer.csproj" />
 </Solution>

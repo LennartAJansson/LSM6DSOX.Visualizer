@@ -101,6 +101,45 @@
                                     ShowCoordinateSystem="True" ShowViewCube="True">
                     <hx:SunLight />
 
+                    <!-- Sensor kropp + riktningsmarkörer -->
+                    <ModelVisual3D x:Name="SensorModel">
+                        <ModelVisual3D.Transform>
+                            <RotateTransform3D>
+                                <RotateTransform3D.Rotation>
+                                    <QuaternionRotation3D x:Name="CubeRotation" />
+                                </RotateTransform3D.Rotation>
+                            </RotateTransform3D>
+                        </ModelVisual3D.Transform>
+                        <ModelVisual3D.Children>
+                            <!-- Sensorhus -->
+                            <hx:BoxVisual3D Center="0,0,0"
+                                            Width="1.2"
+                                            Length="0.8"
+                                            Height="0.2"
+                                            Fill="#FF4FC3F7" />
+
+                            <!-- Babord / vänster (+Y) -->
+                            <hx:BoxVisual3D Center="0,0.43,0"
+                                            Width="1.16"
+                                            Length="0.06"
+                                            Height="0.22"
+                                            Fill="#FFE53935" />
+
+                            <!-- Styrbord / höger (-Y) -->
+                            <hx:BoxVisual3D Center="0,-0.43,0"
+                                            Width="1.16"
+                                            Length="0.06"
+                                            Height="0.22"
+                                            Fill="#FF43A047" />
+
+                            <!-- Framåt (+X) -->
+                            <hx:ArrowVisual3D Point1="0.40,0,0.16"
+                                              Point2="1.05,0,0.16"
+                                              Diameter="0.05"
+                                              Fill="#FFFFD54F" />
+                        </ModelVisual3D.Children>
+                    </ModelVisual3D>
+
                     <ModelVisual3D>
                         <ModelVisual3D.Content>
                             <Model3DGroup>
@@ -119,25 +158,6 @@
                         </ModelVisual3D.Content>
                     </ModelVisual3D>
 
-                    <!-- Sensorkuben -->
-                    <ModelVisual3D x:Name="SensorCube">
-                        <ModelVisual3D.Content>
-                            <Model3DGroup>
-                                <GeometryModel3D x:Name="CubeGeometry">
-                                    <GeometryModel3D.Material>
-                                        <DiffuseMaterial Brush="#FF4FC3F7" />
-                                    </GeometryModel3D.Material>
-                                </GeometryModel3D>
-                            </Model3DGroup>
-                        </ModelVisual3D.Content>
-                        <ModelVisual3D.Transform>
-                            <RotateTransform3D>
-                                <RotateTransform3D.Rotation>
-                                    <QuaternionRotation3D x:Name="CubeRotation" />
-                                </RotateTransform3D.Rotation>
-                            </RotateTransform3D>
-                        </ModelVisual3D.Transform>
-                    </ModelVisual3D>
 
                     <!-- Accelerationsvektor -->
                     <hx:ArrowVisual3D x:Name="AccelArrow"
@@ -146,8 +166,11 @@
                                       Fill="#FFFF7043" />
                 </hx:HelixViewport3D>
 
-                <TextBlock Style="{StaticResource LegendText}" VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                    <Run Text="■" Foreground="#FF4FC3F7" /><Run Text=" Orientering     " />
+                <TextBlock Style="{StaticResource LegendText}" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextWrapping="Wrap">
+                    <Run Text="■" Foreground="#FF4FC3F7" /><Run Text=" Sensorhus     " />
+                    <Run Text="■" Foreground="#FFE53935" /><Run Text=" Babord/Vänster     " />
+                    <Run Text="■" Foreground="#FF43A047" /><Run Text=" Styrbord/Höger     " />
+                    <Run Text="■" Foreground="#FFFFD54F" /><Run Text=" Framåt     " />
                     <Run Text="■" Foreground="#FFFF7043" /><Run Text=" Accelerationsvektor" />
                 </TextBlock>
             </Grid>

@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
-using HelixToolkit.Wpf;
 using LSM6DSOX.Visualizer.Models;
 using ScottPlot.WPF;
 using SpColor = ScottPlot.Color;
@@ -43,7 +42,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        BuildCubeGeometry();
 
         _accel = new ChartSeries(AccelPlot, "Acceleration", "g", minSpan: 0.5);
         _ax = _accel.AddLine(AxisX);
@@ -67,14 +65,6 @@ public partial class MainWindow : Window
         };
     }
 
-    private void BuildCubeGeometry()
-    {
-        var builder = new MeshBuilder();
-        // Kub som representerar sensorbrädet: bredare i X/Y, tunnare i Z
-        builder.AddBox(new Point3D(0, 0, 0), 1.2, 0.8, 0.2);
-        CubeGeometry.Geometry = builder.ToMesh();
-    }
-
     private void StartNats()
     {
         _subscriber = new NatsImuSubscriber(NatsUrl, NatsSubject);
@@ -82,6 +72,7 @@ public partial class MainWindow : Window
         _subscriber.StatusChanged += s => Dispatcher.InvokeAsync(() => SetStatus(Brushes.Orange, s));
         _subscriber.ConnectionError += ex => Dispatcher.InvokeAsync(() => SetStatus(Brushes.Red, $"Fel: {ex.Message}"));
 
+        SetStatus(Brushes.Orange, $"Ansluter till NATS ({NatsSubject})...");
         _uiTimer.Start();
         // Anslutningen blockerar – kör den utanför UI-tråden
         Task.Run(_subscriber.Start);
