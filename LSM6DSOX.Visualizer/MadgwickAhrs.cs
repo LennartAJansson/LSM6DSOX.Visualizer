@@ -1,26 +1,20 @@
-using System;
-
 namespace LSM6DSOX.Visualizer;
 
 /// <summary>
 /// Madgwicks IMU-algoritm (accelerometer + gyroskop, ingen magnetometer).
 /// Tar emot gyrodata i grader/sekund och accelerometerdata i valfri enhet
 /// (normaliseras internt), och underhåller en orienteringskvaternion.
+/// Tidssteget skickas in per uppdatering så att filtret följer sensorns verkliga
+/// samplingstakt i stället för ett hårdkodat värde.
 /// </summary>
 public class MadgwickAhrs
 {
-    private readonly double _sampleFreqHz;
     public double Beta { get; set; } = 0.1;
 
     public double Q0 { get; private set; } = 1.0;
     public double Q1 { get; private set; } = 0.0;
     public double Q2 { get; private set; } = 0.0;
     public double Q3 { get; private set; } = 0.0;
-
-    public MadgwickAhrs(double sampleFreqHz)
-    {
-        _sampleFreqHz = sampleFreqHz;
-    }
 
     /// <summary>
     /// Uppdaterar orienteringen med ett nytt sensorsampel.
@@ -31,7 +25,8 @@ public class MadgwickAhrs
     /// <param name="ax">Accel X (valfri konsekvent enhet, t.ex. g)</param>
     /// <param name="ay">Accel Y</param>
     /// <param name="az">Accel Z</param>
-    public void UpdateImu(double gxDps, double gyDps, double gzDps, double ax, double ay, double az)
+    /// <param name="dtSeconds">Tid sedan föregående sampel i sekunder (måste vara &gt; 0)</param>
+    public void UpdateImu(double gxDps, double gyDps, double gzDps, double ax, double ay, double az, double dtSeconds)
     {
         double gx = gxDps * Math.PI / 180.0;
         double gy = gyDps * Math.PI / 180.0;
@@ -68,15 +63,28 @@ public class MadgwickAhrs
             qDot4 -= Beta * s3;
         }
 
-        q0 += qDot1 * (1.0 / _sampleFreqHz);
-        q1 += qDot2 * (1.0 / _sampleFreqHz);
-        q2 += qDot3 * (1.0 / _sampleFreqHz);
-        q3 += qDot4 * (1.0 / _sampleFreqHz);
+        q0 += qDot1 * dtSeconds;
+        q1 += qDot2 * dtSeconds;
+        q2 += qDot3 * dtSeconds;
+        q3 += qDot4 * dtSeconds;
 
         double norm = 1.0 / Math.Sqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
         Q0 = q0 * norm;
         Q1 = q1 * norm;
         Q2 = q2 * norm;
         Q3 = q3 * norm;
+    }
+
+    /// <summary>
+    /// Orienteringen som roll/pitch/yaw i grader. Yaw driftar över tid eftersom
+    /// det saknas magnetometer som kan ge en absolut referens.
+    /// </summary>
+    public (double Roll, double Pitch, double Yaw) GetEulerDegrees()
+    {
+        var roll = Math.Atan2(2.0 * (Q0 * Q1 + Q2 * Q3), 1.0 - 2.0 * (Q1 * Q1 + Q2 * Q2));
+        var pitch = Math.Asin(Math.Clamp(2.0 * (Q0 * Q2 - Q3 * Q1), -1.0, 1.0));
+        var yaw = Math.Atan2(2.0 * (Q0 * Q3 + Q1 * Q2), 1.0 - 2.0 * (Q2 * Q2 + Q3 * Q3));
+        const double toDegrees = 180.0 / Math.PI;
+        return (roll * toDegrees, pitch * toDegrees, yaw * toDegrees);
     }
 }
